@@ -1,9 +1,5 @@
-from asyncio.base_events import Server
-from os import WIFCONTINUED, read
 import asyncio
 import aiofiles
-
-
 
 
 PROTOCOL = "РКСОК/1.0"
@@ -27,7 +23,7 @@ class ServerRKSOK:
     def __init__(self, request: bytes) -> None:
         self._request = request.decode(ENCODING)
         self._action_from_request, self._name_from_request, self._phone_from_request = None, None, None
-        self._status, self._response, self._response_phone = None, None, None
+        self._status, self._response = None, None
 
     async def _process(self):
         self._parse_request()
@@ -36,6 +32,7 @@ class ServerRKSOK:
             self._status == ResponseStatus.OK
         else:
             self._status == ResponseStatus.INCORRECT_REQUEST
+
 
     async def _compose_response(self):
         
@@ -56,15 +53,6 @@ class ServerRKSOK:
                 await f.write(self._phone_from_request)
         except Exception as e:
             print(type(e), e)
-
-    
-
-
-
-
-
-
-
 
 
 async def proccess(reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
