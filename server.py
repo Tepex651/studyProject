@@ -1,9 +1,8 @@
 from asyncio.base_events import Server
-from os import read
-import socket
-import sys
+from os import WIFCONTINUED, read
 import asyncio
-from enum import Enum
+import aiofiles
+
 
 
 
@@ -30,10 +29,17 @@ class ServerRKSOK:
         self._action_from_request, self._name_from_request, self._phone_from_request = None, None, None
         self._status, self._response, self._response_phone = None, None, None
 
-    def _compose_response(self):
+    async def _process(self):
         self._parse_request()
-        pass 
+        if self._action_from_request == RequestVerb.WRITE:
+            await self._write()
+            self._status == ResponseStatus.OK
+        else:
+            self._status == ResponseStatus.INCORRECT_REQUEST
 
+    async def _compose_response(self):
+        
+        pass
 
     def _parse_request(self):
         action_and_name_from_request = self._request.split(PROTOCOL)
@@ -44,8 +50,15 @@ class ServerRKSOK:
         print('self._name_from_request=', self._name_from_request)
         print('self._phone_from_request=', self._phone_from_request)
 
-    def _write(self):
-        pass
+    async def _write(self):
+        try:
+            async with aiofiles.open(f'phonebook/{self._name_from_request}.txt', 'w') as f:
+                await f.write(self._phone_from_request)
+        except Exception as e:
+            print(type(e), e)
+
+    
+
 
 
 
@@ -57,7 +70,7 @@ class ServerRKSOK:
 async def proccess(reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
     request = await reader.read(100)
     response = ServerRKSOK(request)
-    response._compose_response()
+    await response._compose_response()
     message = request.decode(ENCODING)
     print(f"Received {message!r}")
 
