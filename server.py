@@ -1,4 +1,5 @@
 import asyncio
+from asyncio import queues
 import aiofiles
 import aiofiles.os
 
@@ -91,14 +92,25 @@ class ServerRKSOK:
 async def proccess(reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
     request = await reader.read(100)
     server = ServerRKSOK(request)
-    response = await server._compose_response()
+    answer = await ask_server_checker(request)
+    if answer.decode(ENCODING).startswith('МОЖНА'):
+        response = await server._compose_response()
+        print('МОЖНА')
+    else:
+        response = answer
     print(f"Received {request.decode(ENCODING)!r}")
     print(f"Send: {response.decode(ENCODING)!r}")
     writer.write(response)
     await writer.drain()
-    print("Close the connection")
-    # writer.close()
+    writer.close()
 
+async def ask_server_checker(request):
+    reader, writer = await asyncio.open_connection('vragi-vezde.to.digital', 51624)
+    question = f"АМОЖНА? {PROTOCOL}\r\n".encode(ENCODING) + request
+    writer.write(question)
+    answer = await reader.read(100)
+    writer.close()
+    return answer
 
 async def main():
     server = await asyncio.start_server(proccess, '', 8000)
