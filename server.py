@@ -1,9 +1,6 @@
-from asyncio.base_events import Server
 from os import read
-import socket
-import sys
 import asyncio
-from enum import Enum
+import aiofiles
 
 
 
@@ -28,10 +25,14 @@ class ServerRKSOK:
     def __init__(self, request: bytes) -> None:
         self._request = request.decode(ENCODING)
         self._action_from_request, self._name_from_request, self._phone_from_request = None, None, None
-        self._status, self._response, self._response_phone = None, None, None
+        self._status, self._response = None, None
 
     def _compose_response(self):
         self._parse_request()
+        if self._action_from_request == RequestVerb.WRITE:
+            self._write()
+
+        print(f"{self._status} {PROTOCOL}")
         pass 
 
 
@@ -44,13 +45,13 @@ class ServerRKSOK:
         print('self._name_from_request=', self._name_from_request)
         print('self._phone_from_request=', self._phone_from_request)
 
-    def _write(self):
-        pass
-
-
-
-
-
+    async def _write(self):
+        try:
+            async with aiofiles.open(f'phonebook/{self._name_from_request}', 'w') as f:
+                f.write(self._phone_from_request)
+                self._status = ResponseStatus.OK
+        except Exception:
+            self._status = ResponseStatus.NOT_APPROVED
 
 
 
