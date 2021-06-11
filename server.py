@@ -27,10 +27,10 @@ class ServerRKSOK:
         self._action_from_request, self._name_from_request, self._phone_from_request = None, None, None
         self._status, self._response = None, None
 
-    def _compose_response(self):
+    async def _compose_response(self):
         self._parse_request()
         if self._action_from_request == RequestVerb.WRITE:
-            self._write()
+            await self._write()
 
         print(f"{self._status} {PROTOCOL}")
         pass 
@@ -75,42 +75,3 @@ async def main():
         await server.serve_forever()
 
 asyncio.run(main())
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# class ServerRKSOK:
-#     def __init__(self, port: int) -> None:
-#         self._port = port
-#         self._name, self._phone, self._action = None
-#         self._request, self._response = None
-
-    
-#     def proccess(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
-        
-#         pass
-
-#     def get_request(self, ):
-#         pass
-
-
-# async def main():
-#     server = ServerRKSOK(8000)
