@@ -75,3 +75,42 @@ async def main():
         await server.serve_forever()
 
 asyncio.run(main())
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# class ServerRKSOK:
+#     def __init__(self, port: int) -> None:
+#         self._port = port
+#         self._name, self._phone, self._action = None
+#         self._request, self._response = None
+
+    
+#     def proccess(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
+        
+#         pass
+
+#     def get_request(self, ):
+#         pass
+
+
+# async def main():
+#     server = ServerRKSOK(8000)
